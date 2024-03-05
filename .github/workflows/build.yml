@@ -1,5 +1,8 @@
 name: Build, Test & Publish
 
+permissions:
+  contents: write
+
 on:
   push:
     paths:
@@ -34,12 +37,16 @@ jobs:
     - name: Build
       working-directory: ${{env.working-directory}}
       run: npm run build
-    - name: Upload artifact
-      uses: actions/upload-artifact@v3
+    #- name: Upload artifact
+    #  uses: actions/upload-artifact@v4
+    #  with:
+    #    # Artifact name
+    #    name: package
+    #    # Directory containing files to upload
+    #    path: ${{env.working-directory}}/dist/
+    #    # Days before delete
+    #    retention-days: 1
+    - name: Deploy 🚀
+      uses: JamesIves/github-pages-deploy-action@v4
       with:
-        # Artifact name
-        name: package
-        # Directory containing files to upload
-        path: ${{env.working-directory}}/dist/
-        # Days before delete
-        retention-days: 1
+        folder: src/dist/ # The folder the action should deploy.
