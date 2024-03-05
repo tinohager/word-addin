@@ -34,3 +34,12 @@ jobs:
     - name: Build
       working-directory: ${{env.working-directory}}
       run: npm run build
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        # Artifact name
+        name: package
+        # Directory containing files to upload
+        path: ${{env.working-directory}}/dist/
+        # Days before delete
+        retention-days: 1
