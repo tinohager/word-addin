@@ -1,0 +1,36 @@
+name: Build, Test & Publish
+
+on:
+  push:
+    paths:
+    - 'src/**'
+    - '.github/workflows/**'
+    branches: [ main ]
+  pull_request:
+    paths:
+    - 'src/**'
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    env:
+      working-directory: ./src/word-plugin
+
+    strategy:
+      matrix:
+        node-version: ['20.x']
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Clean slate
+      working-directory: ${{env.working-directory}}
+      run: npm ci
+    - name: Build
+      working-directory: ${{env.working-directory}}
+      run: npm run build
