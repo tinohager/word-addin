@@ -113,7 +113,7 @@ export async function run1() {
     console.log(`Execution time update word formatting: ${end - start} ms`);
     start = performance.now();
 
-    context.sync();
+    await context.sync();
 
     end = performance.now();
     console.log(`Execution time context sync: ${end - start} ms`);
