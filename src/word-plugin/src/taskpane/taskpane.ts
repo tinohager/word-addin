@@ -15,26 +15,27 @@ Office.onReady((info) => {
 });
 
 export async function run1() {
+  console.log("Run V1");
   return await Word.run(async (context) => {
     let start = performance.now();
 
     document.getElementById("progressbox").style.display = "block";
     document.getElementById("progressbar").style.width = "0%";
-    
+
     const paragraphs = context.document.body.paragraphs;
 
     // load text
     //paragraphs.load("$all");
-    paragraphs.load("text");
+    paragraphs.load(["text"]);
     await context.sync();
 
     document.getElementById("progressbar").style.width = "10%";
 
-    const end2 = performance.now();
-    console.log(`Execution time1: ${end2 - start} ms`);
+    let end = performance.now();
+    console.log(`Execution time load paragraphs: ${end - start} ms`);
     start = performance.now();
 
-    const wordChars = [];
+    const wordsRangeCollections = [];
 
     for (let i = 0; i < paragraphs.items.length; i++) {
       const paragraph = paragraphs.items[i];
@@ -44,33 +45,40 @@ export async function run1() {
         const wordsRangeCollection = paragraph.getRange().split([" "]);
 
         wordsRangeCollection.load("$none");
+        wordsRangeCollections.push(wordsRangeCollection);
+      }
+    }
 
-        try {
-          await wordsRangeCollection.context.sync();
-        } catch (error) {
-          console.error("error on sync1 - " + error);
-          continue;
-        }
+    try {
+      await context.sync();
+    } catch (error) {
+      console.error("error on sync2 - " + error);
+    }
 
-        for (let j = 0; j < wordsRangeCollection.items.length; j++) {
-          const wordRange = wordsRangeCollection.items[j];
+    end = performance.now();
+    console.log(`Execution time load wordsRangeCollections: ${end - start} ms`);
+    start = performance.now();
 
-          const wordChar = wordRange.getRange().split([""]);
+    const wordChars = [];
 
-          //wordChar.load("font");
-          wordChar.load("$none");
+    for (let i = 0; i < wordsRangeCollections.length; i++) {
+      const wordsRangeCollection = wordsRangeCollections[i];
 
-          wordChars.push(wordChar);
+      for (let j = 0; j < wordsRangeCollection.items.length; j++) {
+        const wordRange = wordsRangeCollection.items[j];
 
-          wordChar.untrack();
-        }
+        const wordChar = wordRange.getRange().split([""]);
+
+        wordChar.load("$none");
+        wordChars.push(wordChar);
+        //wordChar.untrack();
       }
     }
 
     document.getElementById("progressbar").style.width = "30%";
 
-    const end1 = performance.now();
-    console.log(`Execution time2: ${end1 - start} ms`);
+    end = performance.now();
+    console.log(`Execution time load wordChars: ${end - start} ms`);
     start = performance.now();
 
     document.getElementById("progressbar").style.width = "40%";
@@ -101,14 +109,14 @@ export async function run1() {
 
     document.getElementById("progressbar").style.width = "60%";
 
-    const end = performance.now();
-    console.log(`Execution time3: ${end - start} ms`);
+    end = performance.now();
+    console.log(`Execution time update word formatting: ${end - start} ms`);
     start = performance.now();
 
-    await context.sync();
+    context.sync();
 
-    const end4 = performance.now();
-    console.log(`Execution time4: ${end4 - start} ms`);
+    end = performance.now();
+    console.log(`Execution time context sync: ${end - start} ms`);
 
     document.getElementById("progressbar").style.width = "100%";
     document.getElementById("progressbox").style.display = "none";
@@ -116,6 +124,7 @@ export async function run1() {
 }
 
 export async function run2() {
+  console.log("Run V2");
   return await Word.run(async (context) => {
     const start = performance.now();
 
@@ -145,7 +154,7 @@ export async function run2() {
         await wordsRangeCollection.context.sync();
 
         const wordChars = [];
-        
+
         for (let j = 0; j < wordsRangeCollection.items.length; j++) {
           const wordRange = wordsRangeCollection.items[j];
 
