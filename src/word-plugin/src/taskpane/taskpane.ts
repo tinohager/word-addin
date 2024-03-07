@@ -5,7 +5,7 @@
 
 /* global document, Office, Word */
 
-const addinVersion = "1.2";
+const addinVersion = "1.3";
 
 Office.onReady((info) => {
   if (info.host === Office.HostType.Word) {
@@ -58,6 +58,8 @@ export async function run1() {
 
     for (let i = 0; i < paragraphs.items.length; i++) {
       const paragraph = paragraphs.items[i];
+
+      paragraph.load("text");
 
       // only process if text available
       if (paragraph.text) {
