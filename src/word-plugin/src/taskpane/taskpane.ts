@@ -26,7 +26,7 @@ export async function run1() {
 
     // load text
     //paragraphs.load("$all");
-    paragraphs.load(["text"]);
+    paragraphs.load(["text", "items"]);
     await context.sync();
 
     document.getElementById("progressbar").style.width = "10%";
@@ -135,7 +135,7 @@ export async function run2() {
 
     // load text
     //paragraphs.load("$all");
-    paragraphs.load("text");
+    paragraphs.load(["text", "items"]);
     await context.sync();
 
     document.getElementById("progressbar").style.width = "10%";
