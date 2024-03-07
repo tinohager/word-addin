@@ -5,7 +5,7 @@
 
 /* global document, Office, Word */
 
-const addinVersion = "1.0";
+const addinVersion = "1.1";
 
 Office.onReady((info) => {
   if (info.host === Office.HostType.Word) {
