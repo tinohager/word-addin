@@ -94,7 +94,7 @@ export async function run1() {
     for (let j = 0; j < wordChars.length; j++) {
       const wordChar = wordChars[j];
       try {
-        if (wordChar && !wordChar.isNullObject) {
+        if (wordChar) {
           if (wordChar.items.length > 2) {
             wordChar.items[1].font.bold = true;
             wordChar.items[2].font.bold = true;
@@ -176,7 +176,7 @@ export async function run2() {
         for (let j = 0; j < wordChars.length; j++) {
           const wordChar = wordChars[j];
 
-          if (wordChar && !wordChar.isNullObject) {
+          if (wordChar) {
             if (wordChar.items.length > 2) {
               wordChar.items[1].font.bold = true;
               wordChar.items[2].font.bold = true;
