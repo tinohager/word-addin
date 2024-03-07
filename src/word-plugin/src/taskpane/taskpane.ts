@@ -5,8 +5,11 @@
 
 /* global document, Office, Word */
 
+const addinVersion = "1.0";
+
 Office.onReady((info) => {
   if (info.host === Office.HostType.Word) {
+    console.log(`AddIn - V${addinVersion}`);
     document.getElementById("sideload-msg").style.display = "none";
     document.getElementById("app-body").style.display = "flex";
     document.getElementById("run1").onclick = run1;
