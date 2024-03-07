@@ -12,10 +12,26 @@ Office.onReady((info) => {
     console.log(`AddIn - V${addinVersion}`);
     document.getElementById("sideload-msg").style.display = "none";
     document.getElementById("app-body").style.display = "flex";
+    document.getElementById("runDemo").onclick = insertTextIntoRange;
     document.getElementById("run1").onclick = run1;
     document.getElementById("run2").onclick = run2;
   }
 });
+
+export async function insertTextIntoRange() {
+  await Word.run(async (context) => {
+    const doc = context.document;
+    const originalRange = doc.getSelection();
+    originalRange.insertText(" (M365)", Word.InsertLocation.end);
+
+    originalRange.load("text");
+    await context.sync();
+
+    doc.body.insertParagraph("Original range: " + originalRange.text, Word.InsertLocation.end);
+
+    await context.sync();
+  });
+}
 
 export async function run1() {
   console.log(`Run V1 - (V${addinVersion})`);
@@ -137,9 +153,10 @@ export async function run2() {
     const paragraphs = context.document.body.paragraphs;
 
     // load text
-    //paragraphs.load("$all");
-    paragraphs.load(["text", "items"]);
-    await context.sync();
+    paragraphs.load("$all");
+    //paragraphs.load(["text", "items"]);
+    //await context.sync();
+    await paragraphs.context.sync();
 
     document.getElementById("progressbar").style.width = "10%";
 
