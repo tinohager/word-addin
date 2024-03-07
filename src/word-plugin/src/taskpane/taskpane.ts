@@ -5,7 +5,7 @@
 
 /* global document, Office, Word */
 
-const addinVersion = "1.1";
+const addinVersion = "1.2";
 
 Office.onReady((info) => {
   if (info.host === Office.HostType.Word) {
@@ -44,9 +44,9 @@ export async function run1() {
     const paragraphs = context.document.body.paragraphs;
 
     // load text
-    //paragraphs.load("$all");
-    paragraphs.load(["text", "items"]);
-    await context.sync();
+    paragraphs.load("$all");
+    //paragraphs.load(["text", "items"]);
+    await paragraphs.context.sync();
 
     document.getElementById("progressbar").style.width = "10%";
 
