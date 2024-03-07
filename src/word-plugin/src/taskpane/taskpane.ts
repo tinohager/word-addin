@@ -18,7 +18,7 @@ Office.onReady((info) => {
 });
 
 export async function run1() {
-  console.log("Run V1");
+  console.log(`Run V1 - (V${addinVersion})`);
   return await Word.run(async (context) => {
     let start = performance.now();
 
@@ -127,7 +127,7 @@ export async function run1() {
 }
 
 export async function run2() {
-  console.log("Run V2");
+  console.log(`Run V2 - (V${addinVersion})`);
   return await Word.run(async (context) => {
     const start = performance.now();
 
