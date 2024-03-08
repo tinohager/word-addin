@@ -3,6 +3,8 @@
  * See LICENSE in the project root for license information.
  */
 
+import { container } from "webpack";
+
 /* global document, Office, Word */
 
 const addinVersion = "1.3";
@@ -20,14 +22,60 @@ Office.onReady((info) => {
 
 export async function insertTextIntoRange() {
   await Word.run(async (context) => {
-    const doc = context.document;
-    const originalRange = doc.getSelection();
-    originalRange.insertText(" (M365)", Word.InsertLocation.end);
 
-    originalRange.load("text");
+    var paragraph = context.document.body.paragraphs.getFirst();
+    context.load(paragraph, ["text", "font"]);
+
     await context.sync();
 
-    doc.body.insertParagraph("Original range: " + originalRange.text, Word.InsertLocation.end);
+    var words = paragraph.getTextRanges([" "], true);
+    context.load(words, ["text", "font"]);
+
+    var boldRanges = [];
+    await context.sync();
+
+    for (var i = 0; i < words.items.length; ++i) {
+      var word = words.items[i];
+      if (word.font.bold) {
+        boldRanges.push(word);
+      }
+    }
+
+    for (var j = 0; j < boldRanges.length; ++j) {
+      boldRanges[j].font.highlightColor = "#FF00FF";
+    }
+
+    console.log("done");
+
+    // const paragraphs = context.document.body.paragraphs;
+
+    // const paragraph = paragraphs.getFirst();
+    // paragraph.style.font.bold = true;
+
+    // paragraph.load("text");
+    // await context.sync();
+
+    // console.log(paragraph.text);
+
+    // const range = paragraph.getRange();
+    // range.load("test");
+    // await context.sync();
+    // console.log(range.text);
+
+    // const words = range.split([""]);
+    // console.log(words.items.length);
+
+    // console.log("load items");
+    // range.load("items");
+    // await context.sync();
+
+    // console.log(words);
+    // console.log(words.items.length);
+
+    // words.load("items");
+    // await words.context.sync();
+    // console.log(words);
+    // words[0].style.font.bold = true;
 
     await context.sync();
   });
