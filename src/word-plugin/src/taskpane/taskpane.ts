@@ -7,7 +7,7 @@ import { container } from "webpack";
 
 /* global document, Office, Word */
 
-const addinVersion = "1.3";
+const addinVersion = "1.4";
 
 Office.onReady((info) => {
   if (info.host === Office.HostType.Word) {
@@ -21,6 +21,7 @@ Office.onReady((info) => {
 });
 
 export async function insertTextIntoRange() {
+  console.log(`Run Demo - (V${addinVersion})`);
   await Word.run(async (context) => {
     let start = performance.now();
 
@@ -29,57 +30,83 @@ export async function insertTextIntoRange() {
     context.load(paragraphs, ["items"]);
     await context.sync();
 
-    console.log(paragraphs.items.length);
+    console.log(`Total paragraphs:${paragraphs.items.length}`);
 
-    const words1: Word.RangeCollection[] = [];
+    const wordCollectionCache: Word.RangeCollection[] = [];
 
-    for (let x = 0; x < paragraphs.items.length; ++x) {
-      const paragraph = paragraphs.items[x];
-      console.log(`load paragraph ${x}`);
+    for (let i = 0; i < paragraphs.items.length; ++i) {
+      const paragraph = paragraphs.items[i];
 
-      var words = paragraph.getTextRanges([" "], true);
-      words1.push(words);
+      // Extract words from a sentence
+      var wordCollection = paragraph.getTextRanges([" "], true);
+      wordCollectionCache.push(wordCollection);
     }
 
-    for (const words of words1) {
-      context.load(words, ["items"]);
+    //Load all words
+    for (const word of wordCollectionCache) {
+      context.load(word, ["items", "text"]);
     }
     await context.sync();
 
-    console.log("process words...");
-    const chars1: Word.RangeCollection[] = [];
-    for (const words of words1) {
-      for (var i = 0; i < words.items.length; ++i) {
-        const charRanges = words.items[i].search("?", { matchWildcards: true });
-        chars1.push(charRanges);
-        //charRanges.load();
-        context.load(charRanges, ["items", "font"]);
-        // await charRanges.context.sync();
+    let end = performance.now();
+    console.log(`Execution time load words: ${end - start} ms`);
+    start = performance.now();
 
-        // for (let z = 0; z < charRanges.items.length; ++z) {
-        //   //console.log(charRanges.items[z].text);
-        //   if (z < 2) {
-        //     charRanges.items[z].font.bold = true;
-        //   }
-        // }
+    console.log(`process words... (${wordCollectionCache.length})`);
+    const charRangeCollectionCache: Word.RangeCollection[] = [];
+    for (const words of wordCollectionCache) {
+      for (let i = 0; i < words.items.length; ++i) {
+        const word = words.items[i];
+
+        if (word.text !== "Lorem") {
+          continue;
+        }
+
+        // const charRangeCollection = word.search("?", {
+        //   matchWildcards: true,
+        //   matchCase: false,
+        //   ignoreSpace: true,
+        //   ignorePunct: true,
+        //   matchPrefix: false,
+        //   matchSuffix: false,
+        //   matchWholeWord: false,
+        // });
+        const charRangeCollection = word.search("*", {
+          matchWildcards: true,
+          matchCase: false,
+          ignoreSpace: true,
+          ignorePunct: true,
+          matchPrefix: false,
+          matchSuffix: false,
+          matchWholeWord: false,
+        });
+        charRangeCollectionCache.push(charRangeCollection);
       }
     }
 
+    end = performance.now();
+    console.log(`Execution time load charRangeCollections1: ${end - start} ms`);
+    start = performance.now();
+
+    for (const charRangeCollection of charRangeCollectionCache) {
+      context.load(charRangeCollection, ["items", "font"]);
+    }
+    end = performance.now();
+    console.log(`Execution time load charRangeCollections2: ${end - start} ms`);
+    start = performance.now();
+
     await context.sync();
 
-    console.log("process chars...");
-    for (const charRanges of chars1) {
-      // const charRanges = words.items[i].search("?", { matchWildcards: true });
-      // chars1.push(charRanges);
-      // //charRanges.load();
-      // context.load(charRanges, ["items"]);
-      // await charRanges.context.sync();
+    end = performance.now();
+    console.log(`Execution time load charRangeCollections3: ${end - start} ms`);
+    start = performance.now();
 
-      for (let z = 0; z < charRanges.items.length; ++z) {
-        //console.log(charRanges.items[z].text);
-        if (z < 2) {
-          if (charRanges.items[z].font.bold !== true) {
-            charRanges.items[z].font.bold = true;
+    console.log(`process chars... (${charRangeCollectionCache.length})`);
+    for (const charRangeCollection of charRangeCollectionCache) {
+      for (let i = 0; i < charRangeCollection.items.length; ++i) {
+        if (i < 2) {
+          if (charRangeCollection.items[i].font.bold !== true) {
+            charRangeCollection.items[i].font.bold = true;
           }
         } else {
           //charRanges.items[z].font.bold = false;
@@ -87,11 +114,15 @@ export async function insertTextIntoRange() {
       }
     }
 
+    end = performance.now();
+    console.log(`Set font style: ${end - start} ms`);
+    start = performance.now();
+
     console.log("last sync step, update document");
     await context.sync();
     console.log("done");
 
-    const end = performance.now();
+    end = performance.now();
     console.log(`Execution time context sync: ${end - start} ms`);
   });
 }
