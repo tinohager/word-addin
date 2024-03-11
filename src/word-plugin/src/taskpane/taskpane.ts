@@ -22,62 +22,77 @@ Office.onReady((info) => {
 
 export async function insertTextIntoRange() {
   await Word.run(async (context) => {
+    let start = performance.now();
 
-    var paragraph = context.document.body.paragraphs.getFirst();
-    context.load(paragraph, ["text", "font"]);
+    var paragraphs = context.document.body.paragraphs;
 
+    context.load(paragraphs, ["items"]);
     await context.sync();
 
-    var words = paragraph.getTextRanges([" "], true);
-    context.load(words, ["text", "font"]);
+    console.log(paragraphs.items.length);
 
-    var boldRanges = [];
+    const words1: Word.RangeCollection[] = [];
+
+    for (let x = 0; x < paragraphs.items.length; ++x) {
+      const paragraph = paragraphs.items[x];
+      console.log(`load paragraph ${x}`);
+
+      var words = paragraph.getTextRanges([" "], true);
+      words1.push(words);
+    }
+
+    for (const words of words1) {
+      context.load(words, ["items"]);
+    }
     await context.sync();
 
-    for (var i = 0; i < words.items.length; ++i) {
-      var word = words.items[i];
-      if (word.font.bold) {
-        boldRanges.push(word);
+    console.log("process words...");
+    const chars1: Word.RangeCollection[] = [];
+    for (const words of words1) {
+      for (var i = 0; i < words.items.length; ++i) {
+        const charRanges = words.items[i].search("?", { matchWildcards: true });
+        chars1.push(charRanges);
+        //charRanges.load();
+        context.load(charRanges, ["items", "font"]);
+        // await charRanges.context.sync();
+
+        // for (let z = 0; z < charRanges.items.length; ++z) {
+        //   //console.log(charRanges.items[z].text);
+        //   if (z < 2) {
+        //     charRanges.items[z].font.bold = true;
+        //   }
+        // }
       }
     }
 
-    for (var j = 0; j < boldRanges.length; ++j) {
-      boldRanges[j].font.highlightColor = "#FF00FF";
+    await context.sync();
+
+    console.log("process chars...");
+    for (const charRanges of chars1) {
+      // const charRanges = words.items[i].search("?", { matchWildcards: true });
+      // chars1.push(charRanges);
+      // //charRanges.load();
+      // context.load(charRanges, ["items"]);
+      // await charRanges.context.sync();
+
+      for (let z = 0; z < charRanges.items.length; ++z) {
+        //console.log(charRanges.items[z].text);
+        if (z < 2) {
+          if (charRanges.items[z].font.bold !== true) {
+            charRanges.items[z].font.bold = true;
+          }
+        } else {
+          //charRanges.items[z].font.bold = false;
+        }
+      }
     }
 
+    console.log("last sync step, update document");
+    await context.sync();
     console.log("done");
 
-    // const paragraphs = context.document.body.paragraphs;
-
-    // const paragraph = paragraphs.getFirst();
-    // paragraph.style.font.bold = true;
-
-    // paragraph.load("text");
-    // await context.sync();
-
-    // console.log(paragraph.text);
-
-    // const range = paragraph.getRange();
-    // range.load("test");
-    // await context.sync();
-    // console.log(range.text);
-
-    // const words = range.split([""]);
-    // console.log(words.items.length);
-
-    // console.log("load items");
-    // range.load("items");
-    // await context.sync();
-
-    // console.log(words);
-    // console.log(words.items.length);
-
-    // words.load("items");
-    // await words.context.sync();
-    // console.log(words);
-    // words[0].style.font.bold = true;
-
-    await context.sync();
+    const end = performance.now();
+    console.log(`Execution time context sync: ${end - start} ms`);
   });
 }
 
