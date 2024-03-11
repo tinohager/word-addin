@@ -58,20 +58,11 @@ export async function insertTextIntoRange() {
       for (let i = 0; i < words.items.length; ++i) {
         const word = words.items[i];
 
-        if (word.text !== "Lorem") {
-          continue;
-        }
+        // if (word.text !== "Lorem") {
+        //   continue;
+        // }
 
-        // const charRangeCollection = word.search("?", {
-        //   matchWildcards: true,
-        //   matchCase: false,
-        //   ignoreSpace: true,
-        //   ignorePunct: true,
-        //   matchPrefix: false,
-        //   matchSuffix: false,
-        //   matchWholeWord: false,
-        // });
-        const charRangeCollection = word.search("*", {
+        const charRangeCollection = word.search("?", {
           matchWildcards: true,
           matchCase: false,
           ignoreSpace: true,
@@ -80,6 +71,18 @@ export async function insertTextIntoRange() {
           matchSuffix: false,
           matchWholeWord: false,
         });
+        // const charRangeCollection = word.search("*", {
+        //   matchWildcards: true,
+        //   matchCase: false,
+        //   ignoreSpace: true,
+        //   ignorePunct: true,
+        //   matchPrefix: false,
+        //   matchSuffix: false,
+        //   matchWholeWord: false,
+        // });
+
+        //const charRangeCollection = word.getRange().split([""]);
+
         charRangeCollectionCache.push(charRangeCollection);
       }
     }
@@ -110,6 +113,7 @@ export async function insertTextIntoRange() {
           }
         } else {
           //charRanges.items[z].font.bold = false;
+          break;
         }
       }
     }
